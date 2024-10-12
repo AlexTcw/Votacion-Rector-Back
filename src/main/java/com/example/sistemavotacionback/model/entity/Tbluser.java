@@ -18,9 +18,11 @@ public class Tbluser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cveuser;
 
-    // Cambia "TBLUSER" por "tbluser"
     @OneToMany(mappedBy = "tbluser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Tblusurol> tblusurols;
+
+    @OneToMany(mappedBy = "tbluser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Tblusuinst> tblusuinsts;
 
     @NonNull
     @Column(name = "NAMEUSR", length = 200)

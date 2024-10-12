@@ -28,6 +28,6 @@ import lombok.Setter;
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "CVEROL", nullable = false)
         @JsonBackReference
-        private Tblrol tblrol; // Esto está correcto
+        private Tblrol tblrol;
     }
 

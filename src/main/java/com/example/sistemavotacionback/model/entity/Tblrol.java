@@ -18,7 +18,6 @@ public class Tblrol {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cverol;
 
-    // Cambia "TBLROL" por "tblrol"
     @OneToMany(mappedBy = "tblrol", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Tblusurol> tblusurols;
 

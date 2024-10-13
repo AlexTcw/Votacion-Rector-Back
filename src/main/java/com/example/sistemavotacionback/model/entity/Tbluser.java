@@ -24,6 +24,12 @@ public class Tbluser {
     @OneToMany(mappedBy = "tbluser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Tblusuinst> tblusuinsts;
 
+    @OneToMany(mappedBy = "tbluser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Tblusucandidato> tblusucandidatos;
+
+    @OneToMany(mappedBy = "tbluser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Tblusuvoto> tblusuvotos;
+
     @NonNull
     @Column(name = "NAMEUSR", length = 200)
     private String nameusr;

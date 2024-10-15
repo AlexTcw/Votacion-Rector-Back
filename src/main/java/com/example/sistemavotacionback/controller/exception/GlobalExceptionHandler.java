@@ -12,8 +12,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> defaultErrorHandler(Exception ex) {
-        System.out.println(ex.getMessage());
-        System.out.println(ex.getCause());
+        ex.printStackTrace();
         ErrorResponse error = new ErrorResponse(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

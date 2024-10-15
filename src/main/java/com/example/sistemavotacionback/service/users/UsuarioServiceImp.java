@@ -5,15 +5,22 @@ import com.example.sistemavotacionback.dao.roles.RolesDao;
 import com.example.sistemavotacionback.dao.usuario.UsuarioDao;
 import com.example.sistemavotacionback.model.entity.*;
 import com.example.sistemavotacionback.model.exception.AccessDeniedException;
-import com.example.sistemavotacionback.model.exception.JsonNullException;
 import com.example.sistemavotacionback.model.exception.ResourceNotFoundException;
+import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonGeneric;
 import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonUsuario;
+import com.example.sistemavotacionback.model.pojos.response.ResponseJsonGeneric;
+import com.example.sistemavotacionback.model.pojos.response.ResponseJsonPage;
 import com.example.sistemavotacionback.model.pojos.response.ResponseJsonUsuario;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-//import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.example.sistemavotacionback.service.util.ValidUtils.validateConsume;
 
 @Service
 public class UsuarioServiceImp implements UsuarioService {
@@ -29,11 +36,13 @@ public class UsuarioServiceImp implements UsuarioService {
     }
 
 
+    /*CREATE AND UPDATE*/
     @Override
     @Transactional
     public ResponseJsonUsuario createOrUpdateUsuario(ConsumeJsonUsuario consume, long cveuser) {
         /*validamos los datos del usuario*/
-        validateConsumeUsuario(consume);
+
+        validateConsume(consume);
 
         /*inicializamos un usuario nuevo*/
         Tbluser usuario = new Tbluser();
@@ -124,18 +133,26 @@ public class UsuarioServiceImp implements UsuarioService {
         return response;
     }
 
-    private void validateConsumeUsuario(ConsumeJsonUsuario consume){
-        if (consume == null){
-            throw new JsonNullException("El json es nulo o esta malformado");
-        } else if (consume.getRolList() == null) {
-            throw new JsonNullException("faltan los roles del usuario");
-        } else if (consume.getInstList() == null) {
-            throw new JsonNullException("faltan las instituciones del usuario");
-        } else if (consume.getName() == null || consume.getName().isEmpty()
-                || consume.getEmail() == null  || consume.getEmail().isEmpty()
-                || consume.getNumCuenta() == null || consume.getNumCuenta().isEmpty()) {
-            throw new JsonNullException("faltan datos personales del usuario");
-        }
-    }
+    @Override
+    public ResponseJsonPage findAllUsersByKey(ConsumeJsonGeneric consume) {
+        validateConsume(consume);
+        ResponseJsonPage response = new ResponseJsonPage();
+        int page,size;
+        String key;
+        Pageable pageable;
+        Map<String, Object> responseMap = new HashMap<>(), data = consume.getDatos();
+        key = data.containsKey("key") ? (String) data.get("key") : null;
+        page = data.containsKey("page") ? (int) data.get("page") : 0;
+        size = data.containsKey("size") ? (int) data.get("size") : 10;
+        pageable = PageRequest.of(page, size);
 
+        var usrResults = usuarioDao.findUserByKeyPage(key, pageable);
+        response.setContent(usrResults.getContent());
+        response.setPage(usrResults.getNumber());
+        response.setSize(usrResults.getSize());
+        response.setTotalElements(usrResults.getTotalElements());
+        response.setTotalPages(usrResults.getTotalPages());
+
+        return response;
+    }
 }

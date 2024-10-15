@@ -1,8 +1,8 @@
 package com.example.sistemavotacionback.controller;
 
-import com.example.sistemavotacionback.model.exception.ResourceNotFoundException;
+import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonGeneric;
 import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonUsuario;
-import com.example.sistemavotacionback.model.pojos.response.ResponseJsonGeneric;
+import com.example.sistemavotacionback.model.pojos.response.ResponseJsonPage;
 import com.example.sistemavotacionback.model.pojos.response.ResponseJsonUsuario;
 import com.example.sistemavotacionback.service.users.UsuarioService;
 import org.springframework.http.MediaType;
@@ -26,5 +26,11 @@ public class UsuarioController {
                                                                      @RequestParam(required = false) Long cveuser) {
         cveuser = (cveuser == null) ? 0L : cveuser;
         return ResponseEntity.ok(usuarioService.createOrUpdateUsuario(consume, cveuser));
+    }
+
+    @PostMapping(value = {"/findAllUserByKey"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseJsonPage> findAllUserByKey(@RequestBody ConsumeJsonGeneric consume) {
+
+        return ResponseEntity.ok(usuarioService.findAllUsersByKey(consume));
     }
 }

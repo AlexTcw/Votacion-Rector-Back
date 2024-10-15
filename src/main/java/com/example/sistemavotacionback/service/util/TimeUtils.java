@@ -3,7 +3,7 @@ package com.example.sistemavotacionback.service.util;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class UtilService {
+public class TimeUtils {
 
     public static String getDateFormated(LocalDateTime date) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");

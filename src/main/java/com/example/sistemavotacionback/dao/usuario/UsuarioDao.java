@@ -1,7 +1,14 @@
 package com.example.sistemavotacionback.dao.usuario;
 
-import org.springframework.stereotype.Repository;
+import com.example.sistemavotacionback.model.entity.Tbluser;
 
-@Repository
 public interface UsuarioDao {
+
+    boolean existsTbluserByCveuser(long cveuser);
+
+    Tbluser createOrUpdateUsuario(Tbluser tbluser);
+
+    Tbluser findTblUserByCveuser(long cveuser);
+
+
 }

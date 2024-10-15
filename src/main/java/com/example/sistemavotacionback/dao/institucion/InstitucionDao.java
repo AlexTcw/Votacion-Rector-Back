@@ -1,7 +1,22 @@
 package com.example.sistemavotacionback.dao.institucion;
 
-import org.springframework.stereotype.Repository;
+import com.example.sistemavotacionback.model.entity.Tblinst;
+import com.example.sistemavotacionback.model.entity.Tblusuinst;
 
-@Repository
+import java.util.List;
+
+
 public interface InstitucionDao {
+
+    boolean existsinstitucionByCveinst(long cveinst);
+
+    Tblinst findInstitutionByCveinst(long id);
+
+    List<String> findInstNamesByCveuser(long cveuser);
+
+    boolean userhaveInstitucionByCveuser(long cveuser);
+
+    void deleteInstitutionByCveUser(long cveuser);
+
+    Tblusuinst createOrUpdateTblusuinst(Tblusuinst tblusuinst);
 }

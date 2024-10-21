@@ -4,6 +4,7 @@ import com.example.sistemavotacionback.model.entity.Tblrol;
 import com.example.sistemavotacionback.model.entity.Tblusurol;
 import com.example.sistemavotacionback.repository.RolesPorUsuarioRepository;
 import com.example.sistemavotacionback.repository.RolesRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class RolesDaoImp implements RolesDao {
     }
 
     @Override
+    @Modifying
     public void deleteRolByCveUser(long cveuser) {
         rolesPorUsuarioRepository.deleteByCveusurol(cveuser);
     }

@@ -5,14 +5,18 @@ import com.example.sistemavotacionback.dao.roles.RolesDao;
 import com.example.sistemavotacionback.dao.usuario.UsuarioDao;
 import com.example.sistemavotacionback.model.entity.*;
 import com.example.sistemavotacionback.model.exception.AccessDeniedException;
+import com.example.sistemavotacionback.model.exception.DuplicateDataException;
 import com.example.sistemavotacionback.model.exception.ResourceNotFoundException;
 import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonGeneric;
+import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonLong;
 import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonUsuario;
 import com.example.sistemavotacionback.model.pojos.response.ResponseJsonGeneric;
+import com.example.sistemavotacionback.model.pojos.response.ResponseJsonLongString;
 import com.example.sistemavotacionback.model.pojos.response.ResponseJsonPage;
 import com.example.sistemavotacionback.model.pojos.response.ResponseJsonUsuario;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +47,15 @@ public class UsuarioServiceImp implements UsuarioService {
         /*validamos los datos del usuario*/
 
         validateConsume(consume);
+
+        //validamos un email repetido
+        if (cveuser == 0) {
+            if (usuarioDao.existsTbluserByEmailuser(consume.getEmail())) {
+                throw new DuplicateDataException("El correo ya existe en base");
+            } else if (usuarioDao.existsTbluserByNumcunetauser(consume.getNumCuenta())) {
+                throw new DuplicateDataException("El numero de cuenta ya existe en base");
+            }
+        }
 
         /*inicializamos un usuario nuevo*/
         Tbluser usuario = new Tbluser();
@@ -94,7 +107,7 @@ public class UsuarioServiceImp implements UsuarioService {
                 rol.setTbluser(usuario);
                 rol.setTblrol(rolesDao.findRolByCverol(cverol));
                 rolesDao.CreateOrUpdateUsuRol(rol);
-            }
+            } else throw new ResourceNotFoundException("No existe un rol con clave: "+cverol);
         }
     }
 
@@ -109,7 +122,7 @@ public class UsuarioServiceImp implements UsuarioService {
                 institucion.setTbluser(usuario);
                 institucion.setTblinst(institucionDao.findInstitutionByCveinst(cveinst));
                 institucionDao.createOrUpdateTblusuinst(institucion);
-            }
+            } else throw new ResourceNotFoundException("No existe una institucion con clave: "+cveinst);
         }
     }
 
@@ -155,4 +168,24 @@ public class UsuarioServiceImp implements UsuarioService {
 
         return response;
     }
+
+    @Override
+    @Transactional
+    public ResponseJsonLongString deleteUserByCveuser(ConsumeJsonLong consume) {
+
+        validateConsume(consume);
+        Tbluser usuario;
+        ResponseJsonLongString response = new ResponseJsonLongString();
+        long cveuser = consume.getId();
+        response.setId(cveuser);
+        response.setKey("usuario eliminado exitosamente");
+        if (usuarioDao.existsTbluserByCveuser(cveuser)){
+            usuarioDao.deleteTbluserByCveuser(cveuser);
+            return response;
+        }
+
+        throw new ResourceNotFoundException("Usuario no encontrado");
+    }
+
+
 }

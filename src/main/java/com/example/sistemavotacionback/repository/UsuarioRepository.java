@@ -4,6 +4,7 @@ import com.example.sistemavotacionback.model.entity.Tbluser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,6 +13,10 @@ public interface UsuarioRepository extends JpaRepository<Tbluser, Integer> {
     Tbluser findTblUserByCveuser(long cveuser);
 
     boolean existsTbluserByCveuser(long cveuser);
+
+    boolean existsTbluserByEmailuser(String emailuser);
+
+    boolean existsTbluserByNumcunetauser(String numcunetauser);
 
     @Query(value = """
         SELECT DISTINCT u.cveuser, u.numcunetauser, u.nameusr, u.apeuser, u.emailuser
@@ -30,4 +35,7 @@ public interface UsuarioRepository extends JpaRepository<Tbluser, Integer> {
         """, nativeQuery = true)
     Page<Object> findUserByKeyPage(@Param("key") String key, Pageable pageable);
 
+
+    @Modifying
+    void deleteByCveuser(long cveuser);
 }

@@ -1,7 +1,9 @@
 package com.example.sistemavotacionback.controller;
 
 import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonGeneric;
+import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonLong;
 import com.example.sistemavotacionback.model.pojos.consume.ConsumeJsonUsuario;
+import com.example.sistemavotacionback.model.pojos.response.ResponseJsonLongString;
 import com.example.sistemavotacionback.model.pojos.response.ResponseJsonPage;
 import com.example.sistemavotacionback.model.pojos.response.ResponseJsonUsuario;
 import com.example.sistemavotacionback.service.users.UsuarioService;
@@ -32,5 +34,11 @@ public class UsuarioController {
     public ResponseEntity<ResponseJsonPage> findAllUserByKey(@RequestBody ConsumeJsonGeneric consume) {
 
         return ResponseEntity.ok(usuarioService.findAllUsersByKey(consume));
+    }
+
+    @DeleteMapping(value = {"/deleteUserByCveuser"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseJsonLongString> deleteUserByCveuser(@RequestBody ConsumeJsonLong consume) {
+
+        return ResponseEntity.ok(usuarioService.deleteUserByCveuser(consume));
     }
 }

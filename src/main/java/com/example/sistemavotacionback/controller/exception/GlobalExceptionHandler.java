@@ -45,4 +45,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(DuplicateDataException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateDataException(DuplicateDataException ex) {
+        String message = (ex != null && ex.getMessage() != null) ? ex.getMessage() : "Data Duplicated";
+        ErrorResponse error = new ErrorResponse(message, HttpStatus.CONFLICT.value());
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @PreAuthorize("denyAll()")
 @CrossOrigin(origins = {"*"})
+@RequestMapping(value = "/usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;

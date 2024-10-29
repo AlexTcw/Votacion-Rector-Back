@@ -1,10 +1,7 @@
 package com.votaciones.back.service.users;
 
 
-import com.votaciones.back.model.pojos.consume.ConsumeJsonGeneric;
-import com.votaciones.back.model.pojos.consume.ConsumeJsonLong;
-import com.votaciones.back.model.pojos.consume.ConsumeJsonString;
-import com.votaciones.back.model.pojos.consume.ConsumeJsonUsuario;
+import com.votaciones.back.model.pojos.consume.*;
 import com.votaciones.back.model.pojos.response.ResponseJsonLongString;
 import com.votaciones.back.model.pojos.response.ResponseJsonPage;
 import com.votaciones.back.model.pojos.response.ResponseJsonString;
@@ -18,5 +15,7 @@ public interface UsuarioService {
 
     ResponseJsonPage findAllUsersByKey(ConsumeJsonGeneric consume);
 
-    ResponseJsonLongString deleteUserByCveuser(ConsumeJsonLong consume);
+    ResponseJsonLongString deleteUserByCveuser(long id);
+
+    ResponseJsonString generateFakeUsersByRange(ConsumeJsonGeneric consume);
 }

@@ -8,14 +8,12 @@ import com.votaciones.back.model.entity.Tblrol;
 import com.votaciones.back.model.entity.Tbluser;
 import com.votaciones.back.model.exception.DuplicateDataException;
 import com.votaciones.back.model.exception.ResourceNotFoundException;
-import com.votaciones.back.model.pojos.consume.ConsumeJsonGeneric;
-import com.votaciones.back.model.pojos.consume.ConsumeJsonLong;
-import com.votaciones.back.model.pojos.consume.ConsumeJsonString;
-import com.votaciones.back.model.pojos.consume.ConsumeJsonUsuario;
+import com.votaciones.back.model.pojos.consume.*;
 import com.votaciones.back.model.pojos.response.ResponseJsonLongString;
 import com.votaciones.back.model.pojos.response.ResponseJsonPage;
 import com.votaciones.back.model.pojos.response.ResponseJsonString;
 import com.votaciones.back.model.pojos.response.ResponseJsonUsuario;
+import com.votaciones.back.service.util.FakeDataGenerator;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,6 +46,11 @@ public class UsuarioServiceImp implements UsuarioService {
         ResponseJsonString response = new ResponseJsonString();
         response.setKey(encryptedPassword);
         return response;
+    }
+
+    public String bcrypt (String password){
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
     }
 
     /*CREATE AND UPDATE*/
@@ -168,11 +171,10 @@ public class UsuarioServiceImp implements UsuarioService {
 
     @Override
     @Transactional
-    public ResponseJsonLongString deleteUserByCveuser(ConsumeJsonLong consume) {
+    public ResponseJsonLongString deleteUserByCveuser(long cveuser) {
 
-        validateConsume(consume);
+        validateConsume(cveuser);
         ResponseJsonLongString response = new ResponseJsonLongString();
-        long cveuser = consume.getId();
         response.setId(cveuser);
         response.setKey("usuario eliminado exitosamente");
         if (usuarioDao.existsTbluserByCveuser(cveuser)){
@@ -183,5 +185,46 @@ public class UsuarioServiceImp implements UsuarioService {
         throw new ResourceNotFoundException("Usuario no encontrado");
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ResponseJsonString generateFakeUsersByRange(ConsumeJsonGeneric consume) {
+        Map<String, Object> data = consume.getDatos();
+        int initialnumcuent = 2000000;
+        long range = (long) data.getOrDefault("range", 10L);
+        List<Integer> cverolList = (List<Integer>) data.getOrDefault("rolList", new ArrayList<>());
+        List<Integer> cveinstList = (List<Integer>) data.getOrDefault("instList", new ArrayList<>());
+        Set<Tbluser> tbluserSet = new HashSet<>();
 
+        // Verificar que listas de roles e instituciones no estén vacías
+        if (cverolList.isEmpty() || cveinstList.isEmpty()) {
+            throw new IllegalArgumentException("Roles e instituciones no pueden estar vacíos");
+        }
+
+        for (int i = 0; i < range; i++) {
+            String nombre = FakeDataGenerator.generarNombre();
+            String genero = nombre.endsWith("a") ? "F" : "M";  // Determinación simple del género
+
+            Tbluser user = Tbluser.builder()
+                    .nameusr(nombre)
+                    .apeuser(FakeDataGenerator.generarApellido())
+                    .emailuser(FakeDataGenerator.generarEmail())
+                    .numcunetauser(String.valueOf(initialnumcuent))
+                    .generouser(genero)
+                    .passworduser(bcrypt(FakeDataGenerator.generarPasword()))
+                    .roles(updateRoles(cverolList))
+                    .instituciones(updateInstituciones(cveinstList))
+                    .build();
+
+            initialnumcuent++;
+            tbluserSet.add(user);
+        }
+
+        usuarioDao.saveall(tbluserSet);
+
+        // Crear la respuesta con la cantidad de usuarios generados
+        ResponseJsonString response = new ResponseJsonString();
+        response.setKey(range + " usuarios generados correctamente");
+
+        return response;
+    }
 }

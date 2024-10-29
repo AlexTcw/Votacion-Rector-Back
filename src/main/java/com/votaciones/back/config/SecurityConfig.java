@@ -37,6 +37,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/docs/**", "/v3/api-docs/**",
                                         "/swagger-ui/**", "/api-docs/**").hasRole("ADMIN")
+                                .requestMatchers("/usuarios/**").hasRole("ADMIN")
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();

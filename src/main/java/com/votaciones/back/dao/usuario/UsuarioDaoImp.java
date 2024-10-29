@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 @Repository
 public class UsuarioDaoImp implements UsuarioDao {
 
@@ -57,5 +59,10 @@ public class UsuarioDaoImp implements UsuarioDao {
     @Override
     public Tbluser findTbluserByNumcunetauser(String numcunetauser) {
         return usuarioRepository.findTbluserByNumcunetauser(numcunetauser);
+    }
+
+    @Override
+    public void saveall(Set<Tbluser> users) {
+        usuarioRepository.saveAll(users);
     }
 }

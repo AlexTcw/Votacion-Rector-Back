@@ -10,6 +10,7 @@ public class TimeUtils {
         return date.format(dateFormatter);
     }
 
+
     public static String getHourFormated(LocalDateTime date) {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         return date.format(timeFormatter);

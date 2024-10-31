@@ -36,4 +36,7 @@ public class Tblcandidato {
 
     @Column(name = "ANIOCAN")
     private Integer aniocan;
+
+    @Column(name = "RESUMEN")
+    private String resumen;
 }

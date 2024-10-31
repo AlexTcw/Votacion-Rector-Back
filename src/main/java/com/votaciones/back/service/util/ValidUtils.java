@@ -1,6 +1,7 @@
 package com.votaciones.back.service.util;
 
 import com.votaciones.back.model.exception.JsonNullException;
+import com.votaciones.back.model.pojos.consume.ConsumeJsonCandidato;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonGeneric;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonUsuario;
 
@@ -9,6 +10,12 @@ public class ValidUtils {
     public static void validateConsume(Object consume){
         if (consume == null){
             throw new JsonNullException("El json es nulo o esta malformado");
+        }
+
+        if (consume instanceof ConsumeJsonGeneric consumeJsonGeneric){
+            if (consumeJsonGeneric.getDatos() == null) {
+                throw new JsonNullException("Falta el campo datos en el json");
+            }
         }
 
         if (consume instanceof ConsumeJsonUsuario consumeJsonUsuario){
@@ -26,10 +33,13 @@ public class ValidUtils {
             }
         }
 
-        if (consume instanceof ConsumeJsonGeneric consumeJsonGeneric){
-            if (consumeJsonGeneric.getDatos() == null) {
-                throw new JsonNullException("Falta el campo datos en el json");
+        if (consume instanceof ConsumeJsonCandidato consumeJsonCandidato){
+            if (consumeJsonCandidato.getCveuser() == null || consumeJsonCandidato.getCveuser() == 0){
+            throw new JsonNullException("falta la clave del usuario");
+            } else if (consumeJsonCandidato.getPlantilla() == null || consumeJsonCandidato.getPlantilla().isEmpty()
+                || consumeJsonCandidato.getResumen() == null || consumeJsonCandidato.getResumen().isEmpty()){
+                    throw new JsonNullException("faltan datos del candidato");
+                }
             }
         }
-    }
 }

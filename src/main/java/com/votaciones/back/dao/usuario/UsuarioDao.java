@@ -4,6 +4,7 @@ import com.votaciones.back.model.entity.Tbluser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Set;
 
 public interface UsuarioDao {
@@ -29,4 +30,5 @@ public interface UsuarioDao {
     void deleteTbluserByCveuser(long cveuser);
 
 
+    List<Tbluser> findAllUsers();
 }

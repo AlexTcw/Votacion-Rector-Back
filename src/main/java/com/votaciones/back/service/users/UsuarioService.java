@@ -18,4 +18,6 @@ public interface UsuarioService {
     ResponseJsonLongString deleteUserByCveuser(long id);
 
     ResponseJsonString generateFakeUsersByRange(ConsumeJsonGeneric consume);
+
+    ResponseJsonString encriptadorContrasenias();
 }

@@ -68,4 +68,9 @@ public class UsuarioController {
 
         return ResponseEntity.ok(usuarioService.generateFakeUsersByRange(consume));
     }
+
+    @PutMapping(value = {"/encryptAllUsersPassword"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseJsonString> encryptAllUsersPassword() {
+        return ResponseEntity.ok(usuarioService.encriptadorContrasenias());
+    }
 }

@@ -227,4 +227,23 @@ public class UsuarioServiceImp implements UsuarioService {
 
         return response;
     }
+
+    @Override
+    public ResponseJsonString encriptadorContrasenias(){
+        ResponseJsonString response = new ResponseJsonString();
+
+        List<Tbluser> allUsers = usuarioDao.findAllUsers();
+
+        for (Tbluser usuario: allUsers){
+            String passwordOriginal = usuario.getPassworduser();
+            String newPassword = bcrypt(passwordOriginal);
+
+            usuario.setPassworduser(newPassword);
+            usuarioDao.createOrUpdateUsuario(usuario);
+        }
+
+        response.setKey("Contraseñas encriptadas por favor verifica las contraseñas que ya estaban encriptadas");
+
+        return response;
+    }
 }

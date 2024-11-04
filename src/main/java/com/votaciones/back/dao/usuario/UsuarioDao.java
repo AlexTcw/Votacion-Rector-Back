@@ -31,4 +31,6 @@ public interface UsuarioDao {
 
 
     List<Tbluser> findAllUsers();
+
+    List<Long>findAllUsersCve();
 }

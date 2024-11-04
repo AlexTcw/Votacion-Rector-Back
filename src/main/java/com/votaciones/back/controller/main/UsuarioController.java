@@ -1,4 +1,4 @@
-package com.votaciones.back.controller;
+package com.votaciones.back.controller.main;
 
 import com.votaciones.back.model.pojos.consume.*;
 import com.votaciones.back.model.pojos.response.ResponseJsonLongString;
@@ -6,7 +6,7 @@ import com.votaciones.back.model.pojos.response.ResponseJsonPage;
 import com.votaciones.back.model.pojos.response.ResponseJsonString;
 import com.votaciones.back.model.pojos.response.ResponseJsonUsuario;
 import com.votaciones.back.service.users.UsuarioService;
-import com.votaciones.back.service.util.ValidUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +27,7 @@ public class UsuarioController {
     }
 
     @PostMapping(value = {"/bcrypt"},consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation
     public ResponseEntity<ResponseJsonString> bcrypt(@RequestBody ConsumeJsonString consume){
         return ResponseEntity.ok(usuarioService.bcrypt(consume));
     }

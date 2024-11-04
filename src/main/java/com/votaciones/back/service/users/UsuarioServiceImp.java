@@ -14,6 +14,7 @@ import com.votaciones.back.model.pojos.response.ResponseJsonPage;
 import com.votaciones.back.model.pojos.response.ResponseJsonString;
 import com.votaciones.back.model.pojos.response.ResponseJsonUsuario;
 import com.votaciones.back.service.util.FakeDataGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,12 +26,15 @@ import java.util.*;
 
 import static com.votaciones.back.service.util.ValidUtils.validateConsume;
 
+@Slf4j
 @Service
 public class UsuarioServiceImp implements UsuarioService {
 
     private final UsuarioDao usuarioDao;
     private final RolesDao rolesDao;
     private final InstitucionDao institucionDao;
+
+
 
     public UsuarioServiceImp(UsuarioDao usuarioDao, RolesDao rolesDao, InstitucionDao institucionDao) {
         this.usuarioDao = usuarioDao;
@@ -229,21 +233,36 @@ public class UsuarioServiceImp implements UsuarioService {
     }
 
     @Override
-    public ResponseJsonString encriptadorContrasenias(){
+    public ResponseJsonString encriptadorContrasenias() {
         ResponseJsonString response = new ResponseJsonString();
 
-        List<Tbluser> allUsers = usuarioDao.findAllUsers();
+        List<Long> cvesuser = usuarioDao.findAllUsersCve();
+        int cvesuserLength = cvesuser.size();
 
-        for (Tbluser usuario: allUsers){
-            String passwordOriginal = usuario.getPassworduser();
-            String newPassword = bcrypt(passwordOriginal);
+        for (long cveuser : cvesuser) {
+            if (usuarioDao.existsTbluserByCveuser(cveuser)) {
+                Tbluser usuario = usuarioDao.findTblUserByCveuser(cveuser);
+                log.warn("Actualizando usuario {}", usuario.getNameusr());
 
-            usuario.setPassworduser(newPassword);
-            usuarioDao.createOrUpdateUsuario(usuario);
+                // Verificar si la contraseña ya está encriptada
+                if (!usuario.getPassworduser().startsWith("$2a$") &&
+                        !usuario.getPassworduser().startsWith("$2b$") &&
+                        !usuario.getPassworduser().startsWith("$2y$")) {
+
+                    usuario.setPassworduser(bcrypt(usuario.getPassworduser()));
+                    usuarioDao.createOrUpdateUsuario(usuario);
+                    log.info("Contraseña encriptada para el usuario: {}", usuario.getNameusr());
+                } else {
+                    log.info("La contraseña para el usuario {} ya está encriptada.", usuario.getNameusr());
+                }
+
+                log.info("Usuarios restantes por encriptar: {}", cvesuserLength - 1);
+                cvesuserLength--;
+            }
         }
 
-        response.setKey("Contraseñas encriptadas por favor verifica las contraseñas que ya estaban encriptadas");
-
+        response.setKey("Proceso de encriptación finalizado. Total de usuarios procesados: " + cvesuser.size());
         return response;
     }
+
 }

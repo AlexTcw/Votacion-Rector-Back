@@ -71,4 +71,9 @@ public class UsuarioDaoImp implements UsuarioDao {
     public List<Tbluser> findAllUsers(){
        return usuarioRepository.findAll();
     }
+
+    @Override
+    public List<Long>findAllUsersCve(){
+        return usuarioRepository.findAllCveuser();
+    }
 }

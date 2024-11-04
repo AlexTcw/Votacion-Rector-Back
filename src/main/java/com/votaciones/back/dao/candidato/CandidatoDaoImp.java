@@ -21,4 +21,14 @@ public class CandidatoDaoImp implements CandidatoDao {
     public Tblcandidato findTblcandidatoByCveuser(long cveuser) {
         return candidatoRepository.findTblcandidatoByCveuser(cveuser);
     }
+
+    @Override
+    public Tblcandidato findTblcandidatoByCvecan(long cvecan) {
+        return candidatoRepository.findTblcandidatoByCvecan(cvecan);
+    }
+
+    @Override
+    public boolean existTblcandidatoByCveCan(long cveCandidato) {
+        return candidatoRepository.existsTblcandidatoByCvecan(cveCandidato);
+    }
 }

@@ -14,4 +14,8 @@ public interface CandidatoRepository extends JpaRepository<Tblcandidato, Integer
                inner join tbluser tu on tu.cveuser = usu_can.cveuser\s
                where tu.cveuser = :cveuser""", nativeQuery = true)
     Tblcandidato findTblcandidatoByCveuser(@Param("cveuser") long cveuser);
+
+    boolean existsTblcandidatoByCvecan(long cveCandidato);
+
+    Tblcandidato findTblcandidatoByCvecan(long cvecan);
 }

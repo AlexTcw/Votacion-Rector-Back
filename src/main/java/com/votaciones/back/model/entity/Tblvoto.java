@@ -25,5 +25,5 @@ public class Tblvoto {
 
     @Column(name = "FECHAVOTA")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
-    private LocalDateTime fechacan;
+    private LocalDateTime fechavota;
 }

@@ -35,6 +35,7 @@ public class Tbluser {
     @JoinTable(name = "USU_CAN", joinColumns = @JoinColumn(name = "CVEUSER"), inverseJoinColumns = @JoinColumn(name = "CVECAN"))
     private Set<Tblcandidato> candidaturas = new HashSet<>();
 
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "USU_VOT", joinColumns = @JoinColumn(name = "CVEUSER"), inverseJoinColumns = @JoinColumn(name = "CVEUSUVOTO"))
     private Set<Tblvoto> votos = new HashSet<>();

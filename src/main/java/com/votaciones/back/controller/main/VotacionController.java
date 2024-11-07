@@ -1,4 +1,4 @@
-package com.votaciones.back.controller;
+package com.votaciones.back.controller.main;
 
 import com.votaciones.back.model.exception.ErrorResponse;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongLong;

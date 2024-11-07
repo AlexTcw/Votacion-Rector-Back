@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface UsuarioRepository extends JpaRepository<Tbluser, Integer> {
 
     Tbluser findTblUserByCveuser(long cveuser);
@@ -49,4 +51,6 @@ public interface UsuarioRepository extends JpaRepository<Tbluser, Integer> {
     @Modifying
     void deleteTbluserByCveuser(long cveuser);
 
+    @Query(value = "SELECT u.cveuser FROM tbluser u", nativeQuery = true)
+    List<Long> findAllCveuser();
 }

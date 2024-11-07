@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Getter
@@ -19,6 +21,9 @@ public class Tblcandidato {
     @Column(name = "CVECAN")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cvecan;
+
+    @ManyToMany(mappedBy = "candidaturas", fetch = FetchType.LAZY)
+    private Set<Tbluser> usuarios = new HashSet<>();
 
     @OneToOne(mappedBy = "candidato")
     private Tblrector rector;

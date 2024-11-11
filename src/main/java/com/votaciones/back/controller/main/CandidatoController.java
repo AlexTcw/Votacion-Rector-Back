@@ -29,9 +29,9 @@ public class CandidatoController {
 
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping(value = {"/findAllCandidatos"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseJsonGeneric> findAllCandidatos(@RequestBody ConsumeJsonString consume) {
-        return ResponseEntity.ok(candidateService.findAllCandidatos(consume));
+    @GetMapping(value = {"/findAllCandidatos"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseJsonGeneric> findAllCandidatos() {
+        return ResponseEntity.ok(candidateService.findAllCandidatos());
     }
 
     @DeleteMapping(value = {"/deleteCandidatoByCvecan"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

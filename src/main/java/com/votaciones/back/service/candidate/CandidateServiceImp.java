@@ -71,18 +71,13 @@ public class CandidateServiceImp implements cantidateService {
     }
 
     @Override
-    public ResponseJsonGeneric findAllCandidatos(ConsumeJsonString consume) {
-        String aniocandidato = consume.getKey();
-        int anio = Year.now().getValue();
-        if (aniocandidato != null) {
-            anio = Integer.parseInt(aniocandidato);
-        }
-
-        List<Tblcandidato> candidatoes = candidatoDao.findAllByAniocan(anio);
+    public ResponseJsonGeneric findAllCandidatos() {
+        List<Long> candidatoes = candidatoDao.findAllCandidatoesByCvecan();
 
         List<ResponseJsonCandidato> candidatosResponse = new ArrayList<>();
-        for (Tblcandidato candidato : candidatoes) {
-            ResponseJsonCandidato candidatoResponse = fillCandidatoResponse(candidato);
+        for (Long candidato : candidatoes) {
+            Tblcandidato tblcandidato = candidatoDao.findTblcandidatoByCvecan(candidato);
+            ResponseJsonCandidato candidatoResponse = fillCandidatoResponse(tblcandidato);
             candidatosResponse.add(candidatoResponse);
         }
 
@@ -107,6 +102,7 @@ public class CandidateServiceImp implements cantidateService {
         ResponseJsonCandidato response = new ResponseJsonCandidato();
         Tbluser usuario = candidato.getUsuarios().stream().findFirst().orElse(null);
         response.setCvecan(candidato.getCvecan());
+        System.out.println(candidato.getUsuarios().stream().findFirst());
         assert usuario != null;
         response.setName(usuario.getNameusr());
         response.setLastName(usuario.getApeuser());

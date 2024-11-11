@@ -19,4 +19,6 @@ public interface CandidatoDao {
     List<Tblcandidato> findAllByAniocan(int aniocan);
 
     void deleteCandidatoByCvecan(long cvecan);
+
+    List<Long>findAllCandidatoesByCvecan();
 }

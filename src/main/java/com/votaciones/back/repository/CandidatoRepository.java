@@ -25,5 +25,8 @@ public interface CandidatoRepository extends JpaRepository<Tblcandidato, Integer
 
     void deleteTblcandidatoByCvecan(long cvecan);
 
+    @Query(value = "SELECT c.cvecan FROM tblcandidato c",nativeQuery = true)
+    List<Long>findAllCandidatoesByCvecan();
+
     
 }

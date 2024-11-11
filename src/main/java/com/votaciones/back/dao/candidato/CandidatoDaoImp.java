@@ -43,4 +43,9 @@ public class CandidatoDaoImp implements CandidatoDao {
     public void deleteCandidatoByCvecan(long cvecan) {
         candidatoRepository.deleteTblcandidatoByCvecan(cvecan);
     }
+
+    @Override
+    public List<Long> findAllCandidatoesByCvecan() {
+        return candidatoRepository.findAllCandidatoesByCvecan();
+    }
 }

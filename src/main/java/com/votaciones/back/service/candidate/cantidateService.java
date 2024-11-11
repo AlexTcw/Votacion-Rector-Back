@@ -12,7 +12,7 @@ public interface cantidateService {
 
     void deleteCandidatoByCvecan(ConsumeJsonLong consume);
 
-    ResponseJsonGeneric findAllCandidatos(ConsumeJsonString consume);
+    ResponseJsonGeneric findAllCandidatos();
 
     ResponseJsonCandidato findCandidatoByCvecan(ConsumeJsonLong consume);
 }

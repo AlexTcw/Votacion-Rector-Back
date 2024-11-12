@@ -99,7 +99,26 @@ public class VotacionServiceImp implements VotacionService {
             String nombre = parts[0];
             String apellido = parts[1];
             if (usuarioDao.existTbluserByNameAndApeUser(nombre, apellido)) {
-                return usuarioDao.findTbluserByNameAndApeUser(parts[0], parts[1]);
+                return usuarioDao.findTbluserByNameAndApeUser(nombre,apellido);
+            }
+        } else if (parts.length == 3) {
+            //nombre apellido apellido
+            String nombre = parts[0];
+            String apellido = parts[1] + " " + parts[2];
+            if (usuarioDao.existTbluserByNameAndApeUser(nombre, apellido)) {
+                return usuarioDao.findTbluserByNameAndApeUser(nombre,apellido);
+            }
+            //nombre nombre apellido
+            String nombrelargo = parts[0] + " " + parts[1];
+            String apellidocorto = parts[2];
+            if (usuarioDao.existTbluserByNameAndApeUser(nombrelargo, apellidocorto)){
+                return usuarioDao.findTbluserByNameAndApeUser(nombrelargo,apellidocorto);
+            }
+        } else if (parts.length == 4) {
+            String nombre = parts[0]+ " " + parts[1];
+            String apellido = parts[2] + " " + parts[3];
+            if (usuarioDao.existTbluserByNameAndApeUser(nombre, apellido)) {
+                return usuarioDao.findTbluserByNameAndApeUser(nombre,apellido);
             }
         }
         return null;

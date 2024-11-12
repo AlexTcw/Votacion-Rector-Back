@@ -13,6 +13,8 @@ public interface UsuarioService {
 
     ResponseJsonUsuario createOrUpdateUsuario(ConsumeJsonUsuario consumeJsonUsuario, long cveuser);
 
+    ResponseJsonUsuario findUserByEmailOrNumcuentaAndPassword(ConsumeJsonString consume);
+
     ResponseJsonPage findAllUsersByKey(ConsumeJsonGeneric consume);
 
     ResponseJsonLongString deleteUserByCveuser(long id);

@@ -76,4 +76,34 @@ public class UsuarioDaoImp implements UsuarioDao {
     public List<Long>findAllUsersCve(){
         return usuarioRepository.findAllCveuser();
     }
+
+    @Override
+    public boolean existTbluserByNameUser(String name){
+        return usuarioRepository.existsTbluserByNameusr(name);
+    }
+
+    @Override
+    public Tbluser findTbluserByNameUser(String name){
+        return usuarioRepository.findTbluserByNameusr(name);
+    }
+
+    @Override
+    public boolean existTbluserByApeUser(String lastName){
+        return usuarioRepository.existsTbluserByApeuser(lastName);
+    }
+
+    @Override
+    public Tbluser findTbluserByApeUser(String LastName){
+        return usuarioRepository.findTbluserByApeuser(LastName);
+    }
+
+    @Override
+    public boolean existTbluserByNameAndApeUser(String name, String lastName){
+        return usuarioRepository.existsTbluserByNameusrAndApeuser(name, lastName);
+    }
+
+    @Override
+    public Tbluser findTbluserByNameAndApeUser(String name, String lastName){
+        return usuarioRepository.findTbluserByNameusrAndApeuser(name, lastName);
+    }
 }

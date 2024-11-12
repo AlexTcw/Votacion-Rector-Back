@@ -2,7 +2,9 @@ package com.votaciones.back.service.candidate;
 
 import com.votaciones.back.dao.candidato.CandidatoDao;
 import com.votaciones.back.dao.institucion.InstitucionDao;
+import com.votaciones.back.dao.invalidCan.InvalidCanDao;
 import com.votaciones.back.dao.usuario.UsuarioDao;
+import com.votaciones.back.model.entity.TblInvlidCandidato;
 import com.votaciones.back.model.entity.Tblcandidato;
 import com.votaciones.back.model.entity.Tblinst;
 import com.votaciones.back.model.entity.Tbluser;
@@ -12,27 +14,29 @@ import com.votaciones.back.model.pojos.consume.ConsumeJsonLong;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonString;
 import com.votaciones.back.model.pojos.response.ResponseJsonCandidato;
 import com.votaciones.back.model.pojos.response.ResponseJsonGeneric;
+import com.votaciones.back.model.pojos.response.ResponseJsonLongString;
 import com.votaciones.back.service.util.ValidUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.Year;
 import java.util.*;
 
 @Slf4j
 @Service
-public class CandidateServiceImp implements cantidateService {
+public class CandidateServiceImp implements CandidateService {
 
     private final UsuarioDao usuarioDao;
-
     private final InstitucionDao institucionDao;
     private final CandidatoDao candidatoDao;
+    private final InvalidCanDao invalidCanDao;
 
-    public CandidateServiceImp(UsuarioDao usuarioDao, InstitucionDao institucionDao, CandidatoDao candidatoDao) {
+
+    public CandidateServiceImp(UsuarioDao usuarioDao, InstitucionDao institucionDao, CandidatoDao candidatoDao, InvalidCanDao invalidCanDao) {
         this.usuarioDao = usuarioDao;
         this.institucionDao = institucionDao;
         this.candidatoDao = candidatoDao;
+        this.invalidCanDao = invalidCanDao;
     }
 
     /*create update cantidates*/
@@ -52,11 +56,49 @@ public class CandidateServiceImp implements cantidateService {
 
         Tbluser newUser = usuarioDao.createOrUpdateUsuario(usuario);
         log.info("guardando usuario");
+
         if (newUser != null){
             candidatoDao.findTblcandidatoByCveuser(newUser.getCveuser());
             return createResponse(newUser);
         }
         throw new RuntimeException("Hubo un problema al guardar al candidato");
+    }
+
+    @Override
+    public ResponseJsonLongString CreateOrUpdateInvalidCan(ConsumeJsonString consume){
+        ValidUtils.validateConsume(consume);
+        ResponseJsonLongString response = new ResponseJsonLongString();
+        Long cvecan = 0L;
+
+        Tblcandidato candidato = new Tblcandidato();
+        candidato.setAniocan(LocalDateTime.now().getYear());
+        candidato.setFechacan(LocalDateTime.now());
+        candidato.setVotos(1L);
+        candidato.setPlantilla("INVALID");
+        candidato.setResumen("INVALID");
+
+
+        candidato = candidatoDao.createOrUpdateCandidato(candidato);
+
+        if (candidato != null){
+            cvecan = candidato.getCvecan();
+            createInvalidUer(consume.getKey(),candidato);
+        }
+
+        response.setId(cvecan);
+        response.setKey("Usuario invalido creado");
+        return response;
+    }
+
+    private void createInvalidUer(String name, Tblcandidato tblcandidato){
+        Set<Tblcandidato> candidatos = new HashSet<>();
+        candidatos.add(tblcandidato);
+
+        TblInvlidCandidato candidato = new TblInvlidCandidato();
+        candidato.setNameinvalid(name);
+        candidato.setCandidaturas(candidatos);
+
+        invalidCanDao.CreateOrUpdateInvalidCan(candidato);
     }
 
     @Override
@@ -76,9 +118,11 @@ public class CandidateServiceImp implements cantidateService {
 
         List<ResponseJsonCandidato> candidatosResponse = new ArrayList<>();
         for (Long candidato : candidatoes) {
-            Tblcandidato tblcandidato = candidatoDao.findTblcandidatoByCvecan(candidato);
-            ResponseJsonCandidato candidatoResponse = fillCandidatoResponse(tblcandidato);
-            candidatosResponse.add(candidatoResponse);
+            if (candidatoDao.existTblcandidatoByCveCan(candidato)){
+                Tblcandidato tblcandidato = candidatoDao.findTblcandidatoByCvecan(candidato);
+                ResponseJsonCandidato candidatoResponse = fillCandidatoResponse(tblcandidato);
+                candidatosResponse.add(candidatoResponse);
+            }
         }
 
         ResponseJsonGeneric response = new ResponseJsonGeneric();
@@ -100,25 +144,29 @@ public class CandidateServiceImp implements cantidateService {
 
     private ResponseJsonCandidato fillCandidatoResponse(Tblcandidato candidato) {
         ResponseJsonCandidato response = new ResponseJsonCandidato();
-        Tbluser usuario = candidato.getUsuarios().stream().findFirst().orElse(null);
-        response.setCvecan(candidato.getCvecan());
-        System.out.println(candidato.getUsuarios().stream().findFirst());
-        assert usuario != null;
-        response.setName(usuario.getNameusr());
-        response.setLastName(usuario.getApeuser());
-        response.setResumen(candidato.getResumen());
-        response.setEmail(usuario.getEmailuser());
-        response.setCveuser(usuario.getCveuser());
-        response.setPlantilla(candidato.getPlantilla());
+        Long cveuser = candidatoDao.findCveuserByCvecan(candidato.getCvecan());
+        if (cveuser != null){
+            Tbluser usuario = usuarioDao.findTblUserByCveuser(cveuser);
+            if (usuario == null) {
+                throw new ResourceNotFoundException("usuario no encontrado");
+            }
 
-        var instUsuarioSet = usuario.getInstituciones();
-        List<String> instUsuarioList = new ArrayList<>();
-        for (Tblinst instituciones: instUsuarioSet) {
-            instUsuarioList.add(instituciones.getNameinst());
+            response.setName(usuario.getNameusr());
+            response.setLastName(usuario.getApeuser());
+            response.setCvecan(candidato.getCvecan());
+            response.setResumen(candidato.getResumen());
+            response.setEmail(usuario.getEmailuser());
+            response.setCveuser(usuario.getCveuser());
+            response.setPlantilla(candidato.getPlantilla());
+
+            var instUsuarioSet = usuario.getInstituciones();
+            List<String> instUsuarioList = new ArrayList<>();
+            for (Tblinst instituciones: instUsuarioSet) {
+                instUsuarioList.add(instituciones.getNameinst());
+            }
+
+            response.setInstList(instUsuarioList);
         }
-
-        response.setInstList(instUsuarioList);
-
         return response;
     }
 
@@ -141,7 +189,9 @@ public class CandidateServiceImp implements cantidateService {
 
         response.setCveuser(usuario.getCveuser());
         //response.setCvecan(candidato.getCvecan());
-        assert candidato != null;
+        if (candidato == null) {
+            throw new ResourceNotFoundException("no eciste el candidato");
+        }
         response.setPlantilla(candidato.getPlantilla());
         response.setEmail(usuario.getEmailuser());
         response.setInstList(institucionDao.findInstNamesByCveuser(usuario.getCveuser()));

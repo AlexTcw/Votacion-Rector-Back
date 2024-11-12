@@ -1,6 +1,7 @@
 package com.votaciones.back.dao.candidato;
 
 import com.votaciones.back.model.entity.Tblcandidato;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,4 +22,10 @@ public interface CandidatoDao {
     void deleteCandidatoByCvecan(long cvecan);
 
     List<Long>findAllCandidatoesByCvecan();
+
+    Long findCveuserByCvecan(@Param("cvecan") Long cvecan);
+
+    boolean existCandidatoByPlantilla(String plantilla);
+
+    Tblcandidato findTblcandidatoByPlantilla(String plantilla);
 }

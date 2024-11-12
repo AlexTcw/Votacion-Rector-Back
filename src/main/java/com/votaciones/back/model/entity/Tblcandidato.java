@@ -22,7 +22,7 @@ public class Tblcandidato {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cvecan;
 
-    @ManyToMany(mappedBy = "candidaturas", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "candidaturas", fetch = FetchType.EAGER)
     private Set<Tbluser> usuarios = new HashSet<>();
 
     @OneToOne(mappedBy = "candidato")

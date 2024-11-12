@@ -5,6 +5,8 @@ import com.votaciones.back.model.pojos.consume.ConsumeJsonLong;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonString;
 import com.votaciones.back.model.pojos.response.ResponseJsonCandidato;
 import com.votaciones.back.model.pojos.response.ResponseJsonGeneric;
+import com.votaciones.back.model.pojos.response.ResponseJsonLongString;
+import com.votaciones.back.service.candidate.CandidateService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,15 +18,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/candidatos")
 public class CandidatoController {
 
-    private final com.votaciones.back.service.candidate.cantidateService candidateService;
+    private final CandidateService candidateService;
 
-    public CandidatoController(com.votaciones.back.service.candidate.cantidateService cantidateService) {
+    public CandidatoController(CandidateService cantidateService) {
         this.candidateService = cantidateService;
     }
 
     @PostMapping(value = {"/createCandidato"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseJsonCandidato> createOrUpdateCandidate(@RequestBody ConsumeJsonCandidato consume) {
         return ResponseEntity.ok(candidateService.createOrUpdateCandidato(consume));
+    }
+
+    @PostMapping(value = {"/createCandidatoInvalid"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseJsonLongString> createCandidatoInvalid(@RequestBody ConsumeJsonString consume) {
+        return ResponseEntity.ok(candidateService.CreateOrUpdateInvalidCan(consume));
     }
 
 

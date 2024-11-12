@@ -26,9 +26,9 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping(value = {"/auth"},produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> auth(){
-        return ResponseEntity.ok("autorizado");
+    @PostMapping(value = {"/auth"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseJsonUsuario> findUsuarioByParam(@RequestBody ConsumeJsonString consume) {
+        return ResponseEntity.ok(usuarioService.findUserByEmailOrNumcuentaAndPassword(consume));
     }
 
 

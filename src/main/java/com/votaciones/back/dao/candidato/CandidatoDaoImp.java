@@ -48,4 +48,20 @@ public class CandidatoDaoImp implements CandidatoDao {
     public List<Long> findAllCandidatoesByCvecan() {
         return candidatoRepository.findAllCandidatoesByCvecan();
     }
+
+    @Override
+    public Long findCveuserByCvecan(Long cvecan) {
+        return candidatoRepository.findCveuserByCvecan(cvecan);
+    }
+
+    @Override
+    public boolean existCandidatoByPlantilla(String plantilla){
+        return candidatoRepository.existsTblcandidatoByPlantilla(plantilla);
+    }
+
+    @Override
+    public Tblcandidato findTblcandidatoByPlantilla(String plantilla){
+        return candidatoRepository.findTblcandidatoByPlantilla(plantilla);
+    }
+
 }

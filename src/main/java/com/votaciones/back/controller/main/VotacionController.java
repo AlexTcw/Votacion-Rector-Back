@@ -2,6 +2,7 @@ package com.votaciones.back.controller.main;
 
 import com.votaciones.back.model.exception.ErrorResponse;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongLong;
+import com.votaciones.back.model.pojos.consume.ConsumeJsonLongString;
 import com.votaciones.back.model.pojos.response.ResponseJsonString;
 import com.votaciones.back.service.votacionService.VotacionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,5 +44,23 @@ public class VotacionController {
             @Parameter(description = "Datos del voto con claves de usuario y candidato", required = true)
             @RequestBody ConsumeJsonLongLong consume) {
         return ResponseEntity.ok(votacionService.validateAndSetVoto(consume));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping(value = {"/setVotoWithKey"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Registra un voto de un usuario cuando le manden un String")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Voto registrado exitosamente"),
+            @ApiResponse(responseCode = "404",
+                    description = "Usuario o candidato no encontrado",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403",
+                    description = "El usuario ya ha votado o no tiene permiso para votar",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<ResponseJsonString> setVotoWithKey(
+            @Parameter(description = "Datos del voto con claves de usuario y candidato", required = true)
+            @RequestBody ConsumeJsonLongString consume) {
+        return ResponseEntity.ok(votacionService.validateAndSetInvalidWithKey(consume));
     }
 }

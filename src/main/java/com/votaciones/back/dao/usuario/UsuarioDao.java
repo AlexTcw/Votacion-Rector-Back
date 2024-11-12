@@ -33,4 +33,16 @@ public interface UsuarioDao {
     List<Tbluser> findAllUsers();
 
     List<Long>findAllUsersCve();
+
+    boolean existTbluserByNameUser(String name);
+
+    Tbluser findTbluserByNameUser(String name);
+
+    boolean existTbluserByApeUser(String lastName);
+
+    Tbluser findTbluserByApeUser(String LastName);
+
+    boolean existTbluserByNameAndApeUser(String name, String lastName);
+
+    Tbluser findTbluserByNameAndApeUser(String name, String lastName);
 }

@@ -151,6 +151,28 @@ public class UsuarioServiceImp implements UsuarioService {
     }
 
     @Override
+    public ResponseJsonUsuario findUserByEmailOrNumcuentaAndPassword(ConsumeJsonString consume) {
+        validateConsume(consume);
+        Tbluser usuario = null; // Inicializar explícitamente a null
+        String param = consume.getKey();
+        System.out.println(param);
+
+        if (usuarioDao.existsTbluserByEmailuser(param)) {
+            usuario = usuarioDao.findTbluserByEmailuser(param);
+        } else if (usuarioDao.existsTbluserByNumcunetauser(param)) {
+            usuario = usuarioDao.findTbluserByNumcunetauser(param);
+        }
+
+        // Verificar si usuario es null y lanzar excepción en caso necesario
+        if (usuario == null) {
+            throw new ResourceNotFoundException("No existe un usuario con: " + param);
+        }
+
+        return fillResponseUser(usuario);
+    }
+
+
+    @Override
     public ResponseJsonPage findAllUsersByKey(ConsumeJsonGeneric consume) {
         validateConsume(consume);
         ResponseJsonPage response = new ResponseJsonPage();

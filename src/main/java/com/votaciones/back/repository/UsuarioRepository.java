@@ -53,4 +53,18 @@ public interface UsuarioRepository extends JpaRepository<Tbluser, Integer> {
 
     @Query(value = "SELECT u.cveuser FROM tbluser u", nativeQuery = true)
     List<Long> findAllCveuser();
+
+    boolean existsTbluserByNameusr(String nameUser);
+
+    Tbluser findTbluserByNameusr(String nameUser);
+
+    boolean existsTbluserByApeuser(String apeUser);
+
+    Tbluser findTbluserByApeuser(String apeUser);
+
+    boolean existsTbluserByNameusrAndApeuser(String nameUser, String apeUser);
+
+    Tbluser findTbluserByNameusrAndApeuser(String nameUser, String apeUser);
+
+
 }

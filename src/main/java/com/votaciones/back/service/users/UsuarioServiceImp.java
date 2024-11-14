@@ -33,6 +33,46 @@ public class UsuarioServiceImp implements UsuarioService {
     private final UsuarioDao usuarioDao;
     private final RolesDao rolesDao;
     private final InstitucionDao institucionDao;
+    public static final String[] NOMBRES_DE_MUJER = {
+            "Ana", "Beatriz", "Camila", "Diana", "Elena",
+            "Fernanda", "Gabriela", "Isabel", "Juana", "Karla",
+            "Lucía", "María", "Natalia", "Olivia", "Patricia",
+            "Rosa", "Sandra", "Teresa", "Valentina", "Yolanda",
+            "Adriana", "Alicia", "Alejandra", "Andrea", "Ariana",
+            "Blanca", "Carla", "Claudia", "Daniela", "Emilia",
+            "Estefanía", "Eva", "Fabiola", "Gloria", "Graciela",
+            "Irma", "Ivanna", "Jacqueline", "Jennifer", "Jessica",
+            "Julia", "Julieta", "Laura", "Lourdes", "Lorena",
+            "Margarita", "Martha", "Monica", "Miranda", "Noelia",
+            "Norma", "Pamela", "Paola", "Rebeca", "Regina",
+            "Rocío", "Sofía", "Susana", "Tamara", "Verónica",
+            "Victoria", "Virginia", "Zaira", "Zulema", "Abril",
+            "Carolina", "Consuelo", "Cristina", "Delia", "Esperanza",
+            "Fátima", "Florencia", "Guadalupe", "Inés", "Ivette",
+            "Jimena", "Lilia", "Liliana", "Luciana", "Maite",
+            "Malena", "Mariana", "Marisol", "Miriam", "Norma",
+            "Pilar", "Renata", "Romina", "Silvia", "Tatiana",
+            "Vanesa", "Violeta", "Yamila", "Yesenia", "Zaida"
+    };
+
+    public static final String[] NOMBRES_DE_HOMBRE = {
+            "Antonio", "Carlos", "David", "Eduardo", "Francisco",
+            "Gabriel", "Héctor", "Ignacio", "Javier", "José",
+            "Juan", "Luis", "Manuel", "Marcos", "Miguel",
+            "Pedro", "Rafael", "Ricardo", "Roberto", "Samuel",
+            "Sergio", "Tomás", "Víctor", "Ángel", "Adrián",
+            "Alberto", "Alexis", "Andrés", "Ángel", "Braulio",
+            "César", "Cristian", "Daniel", "Diego", "Emilio",
+            "Enrique", "Felipe", "Fernando", "Francisco", "Gael",
+            "Gonzalo", "Héctor", "Iker", "Iván", "Joaquín",
+            "Jorge", "José Luis", "Julio", "Kevin", "Leandro",
+            "Leonardo", "Luis Miguel", "Manuel", "Marco", "Mariano",
+            "Nicolás", "Óscar", "Pablo", "Raúl", "Ricardo",
+            "Rodrigo", "Rubén", "Salvador", "Santiago", "Saúl",
+            "Teodoro", "Vicente", "Xavier", "Yago", "Zacarías",
+            "Zuley", "Antonio", "Baltasar", "Felipe", "César"
+    };
+
 
 
 
@@ -216,9 +256,10 @@ public class UsuarioServiceImp implements UsuarioService {
     public ResponseJsonString generateFakeUsersByRange(ConsumeJsonGeneric consume) {
         Map<String, Object> data = consume.getDatos();
         int initialnumcuent = 2000000;
-        long range = (long) data.getOrDefault("range", 10L);
+        long range = ((Integer)data.getOrDefault("range", 10L)).longValue();
         List<Integer> cverolList = (List<Integer>) data.getOrDefault("rolList", new ArrayList<>());
         List<Integer> cveinstList = (List<Integer>) data.getOrDefault("instList", new ArrayList<>());
+        String generousuario = (String) data.getOrDefault("gender",null);
         Set<Tbluser> tbluserSet = new HashSet<>();
 
         // Verificar que listas de roles e instituciones no estén vacías
@@ -226,16 +267,31 @@ public class UsuarioServiceImp implements UsuarioService {
             throw new IllegalArgumentException("Roles e instituciones no pueden estar vacíos");
         }
 
+        Random rand = new Random();
+
         for (int i = 0; i < range; i++) {
-            String nombre = FakeDataGenerator.generarNombre();
-            String genero = nombre.endsWith("a") ? "F" : "M";  // Determinación simple del género
+            String nombre;
+
+            if (generousuario == null) {
+                nombre = FakeDataGenerator.generarNombre();  // Generar un nombre genérico
+                generousuario = nombre.endsWith("a") ? "F" : "M";  // Determinación simple del género
+            } else if ("F".equals(generousuario)) {
+                // Si el género es femenino, asignamos un nombre de mujer aleatorio
+                nombre = NOMBRES_DE_MUJER[rand.nextInt(NOMBRES_DE_MUJER.length)];
+            } else if ("M".equals(generousuario)) {
+                // Si el género es masculino, asignamos un nombre de hombre aleatorio
+                nombre = NOMBRES_DE_HOMBRE[rand.nextInt(NOMBRES_DE_HOMBRE.length)];
+            } else {
+                throw new IllegalArgumentException("Genero no definido correctamente");
+            }
+
 
             Tbluser user = Tbluser.builder()
                     .nameusr(nombre)
                     .apeuser(FakeDataGenerator.generarApellido())
                     .emailuser(FakeDataGenerator.generarEmail())
                     .numcunetauser(String.valueOf(initialnumcuent))
-                    .generouser(genero)
+                    .generouser(generousuario)
                     .passworduser(bcrypt(FakeDataGenerator.generarPasword()))
                     .roles(updateRoles(cverolList))
                     .instituciones(updateInstituciones(cveinstList))

@@ -9,14 +9,16 @@ import com.votaciones.back.model.entity.Tbluser;
 import com.votaciones.back.model.exception.DuplicateDataException;
 import com.votaciones.back.model.exception.ResourceNotFoundException;
 import com.votaciones.back.model.pojos.consume.*;
-import com.votaciones.back.model.pojos.response.ResponseJsonLongString;
-import com.votaciones.back.model.pojos.response.ResponseJsonPage;
-import com.votaciones.back.model.pojos.response.ResponseJsonString;
-import com.votaciones.back.model.pojos.response.ResponseJsonUsuario;
+import com.votaciones.back.model.pojos.response.*;
+import com.votaciones.back.service.users.jwt.JwtService;
 import com.votaciones.back.service.util.FakeDataGenerator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,64 +26,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.votaciones.back.service.util.FakeDataGenerator.NOMBRES_DE_HOMBRE;
+import static com.votaciones.back.service.util.FakeDataGenerator.NOMBRES_DE_MUJER;
 import static com.votaciones.back.service.util.ValidUtils.validateConsume;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UsuarioServiceImp implements UsuarioService {
 
     private final UsuarioDao usuarioDao;
     private final RolesDao rolesDao;
     private final InstitucionDao institucionDao;
-    public static final String[] NOMBRES_DE_MUJER = {
-            "Ana", "Beatriz", "Camila", "Diana", "Elena",
-            "Fernanda", "Gabriela", "Isabel", "Juana", "Karla",
-            "Lucía", "María", "Natalia", "Olivia", "Patricia",
-            "Rosa", "Sandra", "Teresa", "Valentina", "Yolanda",
-            "Adriana", "Alicia", "Alejandra", "Andrea", "Ariana",
-            "Blanca", "Carla", "Claudia", "Daniela", "Emilia",
-            "Estefanía", "Eva", "Fabiola", "Gloria", "Graciela",
-            "Irma", "Ivanna", "Jacqueline", "Jennifer", "Jessica",
-            "Julia", "Julieta", "Laura", "Lourdes", "Lorena",
-            "Margarita", "Martha", "Monica", "Miranda", "Noelia",
-            "Norma", "Pamela", "Paola", "Rebeca", "Regina",
-            "Rocío", "Sofía", "Susana", "Tamara", "Verónica",
-            "Victoria", "Virginia", "Zaira", "Zulema", "Abril",
-            "Carolina", "Consuelo", "Cristina", "Delia", "Esperanza",
-            "Fátima", "Florencia", "Guadalupe", "Inés", "Ivette",
-            "Jimena", "Lilia", "Liliana", "Luciana", "Maite",
-            "Malena", "Mariana", "Marisol", "Miriam", "Norma",
-            "Pilar", "Renata", "Romina", "Silvia", "Tatiana",
-            "Vanesa", "Violeta", "Yamila", "Yesenia", "Zaida"
-    };
-
-    public static final String[] NOMBRES_DE_HOMBRE = {
-            "Antonio", "Carlos", "David", "Eduardo", "Francisco",
-            "Gabriel", "Héctor", "Ignacio", "Javier", "José",
-            "Juan", "Luis", "Manuel", "Marcos", "Miguel",
-            "Pedro", "Rafael", "Ricardo", "Roberto", "Samuel",
-            "Sergio", "Tomás", "Víctor", "Ángel", "Adrián",
-            "Alberto", "Alexis", "Andrés", "Ángel", "Braulio",
-            "César", "Cristian", "Daniel", "Diego", "Emilio",
-            "Enrique", "Felipe", "Fernando", "Francisco", "Gael",
-            "Gonzalo", "Héctor", "Iker", "Iván", "Joaquín",
-            "Jorge", "José Luis", "Julio", "Kevin", "Leandro",
-            "Leonardo", "Luis Miguel", "Manuel", "Marco", "Mariano",
-            "Nicolás", "Óscar", "Pablo", "Raúl", "Ricardo",
-            "Rodrigo", "Rubén", "Salvador", "Santiago", "Saúl",
-            "Teodoro", "Vicente", "Xavier", "Yago", "Zacarías",
-            "Zuley", "Antonio", "Baltasar", "Felipe", "César"
-    };
-
-
-
-
-    public UsuarioServiceImp(UsuarioDao usuarioDao, RolesDao rolesDao, InstitucionDao institucionDao) {
-        this.usuarioDao = usuarioDao;
-        this.rolesDao = rolesDao;
-        this.institucionDao = institucionDao;
-    }
-
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public ResponseJsonString bcrypt(ConsumeJsonString consume) {
@@ -89,6 +47,34 @@ public class UsuarioServiceImp implements UsuarioService {
         String encryptedPassword = passwordEncoder.encode(consume.getKey());
         ResponseJsonString response = new ResponseJsonString();
         response.setKey(encryptedPassword);
+        return response;
+    }
+
+    @Override
+    public ResponseJsonLogin login(ConsumeJsonLogin consume) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(consume.getUsername(),consume.getPassword()));
+        UserDetails user = usuarioDao.findTbluserByEmailOrNumcuentaUser(consume.getUsername());
+        Tbluser tbluser = usuarioDao.findTbluserByEmailOrNumcuentaUser(consume.getUsername());
+        String token = jwtService.getToken(user);
+        return fillResponseUserLogin(tbluser, token);
+    }
+
+    private ResponseJsonLogin fillResponseUserLogin(Tbluser usuario, String token) {
+        ResponseJsonLogin response = new ResponseJsonLogin();
+
+        response.setCveuser(usuario.getCveuser());
+        response.setName(usuario.getNameusr());
+        response.setLastName(usuario.getApeuser());
+        response.setEmail(usuario.getEmailuser());
+        response.setNumCuenta(usuario.getNumcunetauser());
+        response.setToken(token);
+
+        // Obtener nombres de roles usando streams
+        response.setRolList(rolesDao.findRolesNamesByCveuser(usuario.getCveuser()));
+
+        // Obtener nombres de instituciones usando streams
+        response.setInstList(institucionDao.findInstNamesByCveuser(usuario.getCveuser()));
+
         return response;
     }
 
@@ -195,7 +181,6 @@ public class UsuarioServiceImp implements UsuarioService {
         validateConsume(consume);
         Tbluser usuario = null; // Inicializar explícitamente a null
         String param = consume.getKey();
-        System.out.println(param);
 
         if (usuarioDao.existsTbluserByEmailuser(param)) {
             usuario = usuarioDao.findTbluserByEmailuser(param);
@@ -210,7 +195,6 @@ public class UsuarioServiceImp implements UsuarioService {
 
         return fillResponseUser(usuario);
     }
-
 
     @Override
     public ResponseJsonPage findAllUsersByKey(ConsumeJsonGeneric consume) {

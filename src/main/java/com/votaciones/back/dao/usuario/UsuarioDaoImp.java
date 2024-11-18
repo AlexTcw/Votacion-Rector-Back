@@ -1,5 +1,6 @@
 package com.votaciones.back.dao.usuario;
 import com.votaciones.back.model.entity.Tbluser;
+import com.votaciones.back.model.exception.ResourceNotFoundException;
 import com.votaciones.back.repository.UsuarioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -105,5 +106,20 @@ public class UsuarioDaoImp implements UsuarioDao {
     @Override
     public Tbluser findTbluserByNameAndApeUser(String name, String lastName){
         return usuarioRepository.findTbluserByNameusrAndApeuser(name, lastName);
+    }
+
+    @Override
+    public Tbluser findTbluserByEmailOrNumcuentaUser(String param) {
+        Tbluser usuario = null;
+        if (usuarioRepository.existsTbluserByEmailuser(param)) {
+             usuario = usuarioRepository.findTbluserByEmailuser(param);
+        } else if (usuarioRepository.existsTbluserByNumcunetauser(param)) {
+            usuario = usuarioRepository.findTbluserByNumcunetauser(param);
+        }
+        if (usuario == null) {
+            throw new ResourceNotFoundException("No existe un usuario con el parámetro: " + param);
+        }
+
+        return usuario;
     }
 }

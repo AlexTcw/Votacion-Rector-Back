@@ -29,7 +29,6 @@ public interface UsuarioDao {
 
     void deleteTbluserByCveuser(long cveuser);
 
-
     List<Tbluser> findAllUsers();
 
     List<Long>findAllUsersCve();
@@ -45,4 +44,6 @@ public interface UsuarioDao {
     boolean existTbluserByNameAndApeUser(String name, String lastName);
 
     Tbluser findTbluserByNameAndApeUser(String name, String lastName);
+
+    Tbluser findTbluserByEmailOrNumcuentaUser(String param);
 }

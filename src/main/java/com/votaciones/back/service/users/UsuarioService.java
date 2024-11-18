@@ -1,15 +1,15 @@
 package com.votaciones.back.service.users;
 
 
+import com.votaciones.back.model.entity.Tbluser;
 import com.votaciones.back.model.pojos.consume.*;
-import com.votaciones.back.model.pojos.response.ResponseJsonLongString;
-import com.votaciones.back.model.pojos.response.ResponseJsonPage;
-import com.votaciones.back.model.pojos.response.ResponseJsonString;
-import com.votaciones.back.model.pojos.response.ResponseJsonUsuario;
+import com.votaciones.back.model.pojos.response.*;
 
 public interface UsuarioService {
 
     ResponseJsonString bcrypt(ConsumeJsonString consume);
+
+    ResponseJsonLogin login(ConsumeJsonLogin consume);
 
     ResponseJsonUsuario createOrUpdateUsuario(ConsumeJsonUsuario consumeJsonUsuario, long cveuser);
 

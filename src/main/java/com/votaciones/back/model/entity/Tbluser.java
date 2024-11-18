@@ -3,10 +3,15 @@ package com.votaciones.back.model.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @Getter
@@ -16,7 +21,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "TBLUSER")
-public class Tbluser {
+public class Tbluser implements UserDetails {
 
     @Id
     @Column(name = "CVEUSER")
@@ -64,4 +69,44 @@ public class Tbluser {
     @Pattern(regexp = "^[MF]$", message = "El género debe ser 'M' o 'F'")
     @Column(name = "GENEROUSER", length = 1, nullable = false)
     private String generouser;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol.getNamerol())) // Asegúrate de agregar "ROLE_" al rol
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public String getPassword() {
+        return passworduser;
+    }
+
+    @Override
+    public String getUsername() {
+        return emailuser;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
+
+
 }

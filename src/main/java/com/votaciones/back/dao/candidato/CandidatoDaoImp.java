@@ -2,17 +2,15 @@ package com.votaciones.back.dao.candidato;
 
 import com.votaciones.back.model.entity.Tblcandidato;
 import com.votaciones.back.repository.CandidatoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class CandidatoDaoImp implements CandidatoDao {
     private final CandidatoRepository candidatoRepository;
-
-    public CandidatoDaoImp(CandidatoRepository candidatoRepository) {
-        this.candidatoRepository = candidatoRepository;
-    }
 
     @Override
     public Tblcandidato createOrUpdateCandidato(Tblcandidato candidato) {
@@ -32,11 +30,6 @@ public class CandidatoDaoImp implements CandidatoDao {
     @Override
     public boolean existTblcandidatoByCveCan(long cveCandidato) {
         return candidatoRepository.existsTblcandidatoByCvecan(cveCandidato);
-    }
-
-    @Override
-    public List<Tblcandidato> findAllByAniocan(int aniocan) {
-        return candidatoRepository.findAllByAniocan(aniocan);
     }
 
     @Override
@@ -62,6 +55,11 @@ public class CandidatoDaoImp implements CandidatoDao {
     @Override
     public Tblcandidato findTblcandidatoByPlantilla(String plantilla){
         return candidatoRepository.findTblcandidatoByPlantilla(plantilla);
+    }
+
+    @Override
+    public Tblcandidato findTblcandidatoWithMaxVotos() {
+        return candidatoRepository.findTblcandidatoWithMaxVotos();
     }
 
 }

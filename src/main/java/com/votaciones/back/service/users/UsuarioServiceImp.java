@@ -10,6 +10,8 @@ import com.votaciones.back.model.exception.DuplicateDataException;
 import com.votaciones.back.model.exception.ResourceNotFoundException;
 import com.votaciones.back.model.pojos.consume.*;
 import com.votaciones.back.model.pojos.response.*;
+import com.votaciones.back.model.test.TbluserTest;
+import com.votaciones.back.repository.TbluserTestRepository;
 import com.votaciones.back.service.users.jwt.JwtService;
 import com.votaciones.back.service.util.FakeDataGenerator;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class UsuarioServiceImp implements UsuarioService {
     private final InstitucionDao institucionDao;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final TbluserTestRepository tbluserTestRepository;
 
     @Override
     public ResponseJsonString bcrypt(ConsumeJsonString consume) {
@@ -239,12 +242,14 @@ public class UsuarioServiceImp implements UsuarioService {
     @Override
     public ResponseJsonString generateFakeUsersByRange(ConsumeJsonGeneric consume) {
         Map<String, Object> data = consume.getDatos();
-        int initialnumcuent = 2000000;
+        int initialnumcuent = (Integer.parseInt(usuarioDao.findLastNumcuetauser())+1);
+        System.out.println("inicio: "+initialnumcuent);
         long range = ((Integer)data.getOrDefault("range", 10L)).longValue();
         List<Integer> cverolList = (List<Integer>) data.getOrDefault("rolList", new ArrayList<>());
         List<Integer> cveinstList = (List<Integer>) data.getOrDefault("instList", new ArrayList<>());
         String generousuario = (String) data.getOrDefault("gender",null);
         Set<Tbluser> tbluserSet = new HashSet<>();
+        Set<TbluserTest> tbluserTestSet = new HashSet<>();
 
         // Verificar que listas de roles e instituciones no estén vacías
         if (cverolList.isEmpty() || cveinstList.isEmpty()) {
@@ -269,23 +274,39 @@ public class UsuarioServiceImp implements UsuarioService {
                 throw new IllegalArgumentException("Genero no definido correctamente");
             }
 
+            // Generar un número aleatorio entre 1 y 9999
+            int randomNumber = (int) (Math.random() * 9999) + 1;
+
+            // Generar el correo electrónico falso
+            String fakeEmail = randomNumber + FakeDataGenerator.generarEmail();
+
+            String fakeNumCuenta = String.valueOf(initialnumcuent);
+            String fakePassword = FakeDataGenerator.generarPasword();
 
             Tbluser user = Tbluser.builder()
                     .nameusr(nombre)
                     .apeuser(FakeDataGenerator.generarApellido())
-                    .emailuser(FakeDataGenerator.generarEmail())
-                    .numcunetauser(String.valueOf(initialnumcuent))
+                    .emailuser(fakeEmail)
+                    .numcunetauser(fakeNumCuenta)
                     .generouser(generousuario)
-                    .passworduser(bcrypt(FakeDataGenerator.generarPasword()))
+                    .passworduser(bcrypt(fakePassword))
                     .roles(updateRoles(cverolList))
                     .instituciones(updateInstituciones(cveinstList))
                     .build();
 
+            TbluserTest usutest = TbluserTest.builder()
+                    .emailusertest(fakeEmail)
+                    .numcunetausertest(fakeNumCuenta)
+                    .passwordusertest(fakePassword)
+                    .build();
+
             initialnumcuent++;
             tbluserSet.add(user);
+            tbluserTestSet.add(usutest);
         }
 
         usuarioDao.saveall(tbluserSet);
+        tbluserTestRepository.saveAll(tbluserTestSet);
 
         // Crear la respuesta con la cantidad de usuarios generados
         ResponseJsonString response = new ResponseJsonString();

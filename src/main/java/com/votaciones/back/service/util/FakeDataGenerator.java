@@ -7,44 +7,38 @@ public class FakeDataGenerator {
     private static final Faker faker = new Faker();
 
     public static final String[] NOMBRES_DE_MUJER = {
-            "Ana", "Beatriz", "Camila", "Diana", "Elena",
-            "Fernanda", "Gabriela", "Isabel", "Juana", "Karla",
-            "Lucía", "María", "Natalia", "Olivia", "Patricia",
-            "Rosa", "Sandra", "Teresa", "Valentina", "Yolanda",
-            "Adriana", "Alicia", "Alejandra", "Andrea", "Ariana",
-            "Blanca", "Carla", "Claudia", "Daniela", "Emilia",
-            "Estefanía", "Eva", "Fabiola", "Gloria", "Graciela",
-            "Irma", "Ivanna", "Jacqueline", "Jennifer", "Jessica",
-            "Julia", "Julieta", "Laura", "Lourdes", "Lorena",
-            "Margarita", "Martha", "Monica", "Miranda", "Noelia",
-            "Norma", "Pamela", "Paola", "Rebeca", "Regina",
-            "Rocío", "Sofía", "Susana", "Tamara", "Verónica",
-            "Victoria", "Virginia", "Zaira", "Zulema", "Abril",
-            "Carolina", "Consuelo", "Cristina", "Delia", "Esperanza",
-            "Fátima", "Florencia", "Guadalupe", "Inés", "Ivette",
-            "Jimena", "Lilia", "Liliana", "Luciana", "Maite",
-            "Malena", "Mariana", "Marisol", "Miriam", "Norma",
-            "Pilar", "Renata", "Romina", "Silvia", "Tatiana",
-            "Vanesa", "Violeta", "Yamila", "Yesenia", "Zaida"
+            "Alicia", "Violeta", "Raquel", "Lorena", "Camila",
+            "Sofía", "Valeria", "Florencia", "Paola", "Isabel",
+            "Mariana", "Carolina", "Renata", "Beatriz", "Margarita",
+            "Carmen", "Elisa", "Bárbara", "Lucía", "Susana",
+            "Paola", "Julieta", "Luna", "Marta", "Inés",
+            "Fabiola", "Emma", "Laura", "Sara", "Mireya",
+            "Claudia", "Alba", "Andrea", "Catalina", "Nerea",
+            "María José", "Lidia", "Rocío", "Jimena", "Anaís",
+            "Valentina", "Miriam", "Celeste", "Patricia", "Eva",
+            "Zoe", "Catalina", "Selena", "Juliana", "Sonia",
+            "Elena", "Samantha", "Andrea", "Rita", "Cecilia",
+            "Verónica", "Yasmina", "Milena", "Amalia", "Marisol"
     };
 
+
     public static final String[] NOMBRES_DE_HOMBRE = {
-            "Antonio", "Carlos", "David", "Eduardo", "Francisco",
-            "Gabriel", "Héctor", "Ignacio", "Javier", "José",
-            "Juan", "Luis", "Manuel", "Marcos", "Miguel",
-            "Pedro", "Rafael", "Ricardo", "Roberto", "Samuel",
-            "Sergio", "Tomás", "Víctor", "Ángel", "Adrián",
-            "Alberto", "Alexis", "Andrés", "Ángel", "Braulio",
-            "César", "Cristian", "Daniel", "Diego", "Emilio",
-            "Enrique", "Felipe", "Fernando", "Francisco", "Gael",
-            "Gonzalo", "Héctor", "Iker", "Iván", "Joaquín",
-            "Jorge", "José Luis", "Julio", "Kevin", "Leandro",
-            "Leonardo", "Luis Miguel", "Manuel", "Marco", "Mariano",
-            "Nicolás", "Óscar", "Pablo", "Raúl", "Ricardo",
-            "Rodrigo", "Rubén", "Salvador", "Santiago", "Saúl",
-            "Teodoro", "Vicente", "Xavier", "Yago", "Zacarías",
-            "Zuley", "Antonio", "Baltasar", "Felipe", "César"
+            "Adrián", "Luis", "Federico", "Oscar", "Ramón",
+            "Damián", "Víctor", "Tomás", "Carlos", "Jaime",
+            "Ricardo", "Pablo", "Eduardo", "Ángel", "Bernardo",
+            "Iker", "Cristian", "Felipe", "Santiago", "Antonio",
+            "Javier", "Héctor", "Samuel", "Ignacio", "Julio",
+            "Rodrigo", "José", "Fernando", "Martín", "Leandro",
+            "Nicolás", "Maximiliano", "Ernesto", "Antonio", "Ricardo",
+            "Gustavo", "Manuel", "Raúl", "Marco", "César",
+            "Julio", "Felipe", "Iván", "Xavier", "Raúl",
+            "David", "Eduardo", "Víctor", "Braulio", "Guillermo",
+            "Aitor", "Julian", "Álvaro", "Ismael", "Enrique",
+            "Rafael", "Mauricio", "Mario", "José Luis", "Gerardo",
+            "Felipe", "Matías", "Félix", "Leandro", "Yago",
+            "Omar", "Adolfo", "Tobías", "Mauro", "Ricardo"
     };
+
 
     public static String generarNombre() {
         return faker.name().firstName();

@@ -46,4 +46,6 @@ public interface UsuarioDao {
     Tbluser findTbluserByNameAndApeUser(String name, String lastName);
 
     Tbluser findTbluserByEmailOrNumcuentaUser(String param);
+
+    String findLastNumcuetauser();
 }

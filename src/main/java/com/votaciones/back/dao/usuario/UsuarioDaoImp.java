@@ -122,4 +122,10 @@ public class UsuarioDaoImp implements UsuarioDao {
 
         return usuario;
     }
+
+    @Override
+    public String findLastNumcuetauser() {
+        return usuarioRepository.findLastNumcuetauser();
+    }
+
 }

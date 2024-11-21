@@ -31,7 +31,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.findUserByEmailOrNumcuentaAndPassword(consume));
     }
 
-
+    @PreAuthorize("hasRole('USER')")
     @PostMapping(value = {"/bcrypt"},consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation
     public ResponseEntity<ResponseJsonString> bcrypt(@RequestBody ConsumeJsonString consume){

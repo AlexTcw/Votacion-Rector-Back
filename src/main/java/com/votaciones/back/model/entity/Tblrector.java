@@ -34,6 +34,6 @@ public class Tblrector {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime fechafin;
 
-    @Column(name = "DESCRIPCION", length = 200)
+    @Column(name = "DESCRIPCION", columnDefinition = "LONGTEXT")
     private String descripcion;
 }

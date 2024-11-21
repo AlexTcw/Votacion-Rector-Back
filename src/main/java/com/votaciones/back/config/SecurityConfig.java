@@ -27,7 +27,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers("/docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/api-docs/**").hasRole("ADMIN")
+                                .requestMatchers("/docs/**", "/v3/api-docs/**", "/swagger-ui/**", "/api-docs/**").permitAll()
+                                .requestMatchers("/usuarios/bcrypt").hasRole("USER")
                                 .requestMatchers("/usuarios/**").hasRole("ADMIN")
                                 .requestMatchers("/candidatos/**").hasRole("ADMIN")
                                 .requestMatchers("/votacion/**").hasRole("USER")

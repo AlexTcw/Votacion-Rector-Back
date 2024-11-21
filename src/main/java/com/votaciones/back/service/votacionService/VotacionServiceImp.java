@@ -1,18 +1,22 @@
 package com.votaciones.back.service.votacionService;
 
 import com.votaciones.back.dao.candidato.CandidatoDao;
+import com.votaciones.back.dao.rector.RectorDao;
 import com.votaciones.back.dao.usuario.UsuarioDao;
 import com.votaciones.back.dao.voto.VotoDao;
 import com.votaciones.back.model.entity.Tblcandidato;
+import com.votaciones.back.model.entity.Tblrector;
 import com.votaciones.back.model.entity.Tbluser;
 import com.votaciones.back.model.entity.Tblvoto;
 import com.votaciones.back.model.exception.ResourceNotFoundException;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongLong;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongString;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonString;
+import com.votaciones.back.model.pojos.response.ResponseJsonCandidato;
 import com.votaciones.back.model.pojos.response.ResponseJsonString;
 import com.votaciones.back.service.candidate.CandidateService;
 import com.votaciones.back.service.util.ValidUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -20,24 +24,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class VotacionServiceImp implements VotacionService {
 
     private final UsuarioDao usuarioDao;
     private final CandidatoDao candidatoDao;
     private final VotoDao votoDao;
     private final CandidateService candidateService;
-
-    public VotacionServiceImp(UsuarioDao usuarioDao, CandidatoDao candidatoDao, VotoDao votoDao, CandidateService candidateService) {
-        this.usuarioDao = usuarioDao;
-        this.candidatoDao = candidatoDao;
-        this.votoDao = votoDao;
-        this.candidateService = candidateService;
-    }
+    private final RectorDao rectorDao;
 
     @Override
     public ResponseJsonString validateAndSetInvalidWithKey(ConsumeJsonLongString consume){
@@ -53,6 +54,12 @@ public class VotacionServiceImp implements VotacionService {
         Tbluser votante = usuarioDao.findTblUserByCveuser(cveuser);
         if (validVotacionAnual(votante)){
             throw new AccessDeniedException("El usuario "+cveuser + " ya voto");
+        }
+
+        var usuinstList = votante.getInstituciones();
+        long cveentint = 0;
+        for(var usuinst: usuinstList){
+            cveentint = usuinst.getCveinst();
         }
 
         log.info("usuario votante : {}", votante.getNameusr());
@@ -72,7 +79,7 @@ public class VotacionServiceImp implements VotacionService {
             response.setKey("usuario invalido creado");
         }
 
-        if (candidato != null) {findAndsetVoto(candidato.getCvecan());}
+        if (candidato != null) {findAndSetVoto(candidato.getCvecan(), cveentint);}
 
         votante.setVotos(addVotoUsuario());
         usuarioDao.createOrUpdateUsuario(votante);
@@ -124,6 +131,40 @@ public class VotacionServiceImp implements VotacionService {
         return null;
     }
 
+    @Transactional
+    @Override
+    public ResponseJsonCandidato setWinner(){
+        Tblcandidato winner = candidatoDao.findTblcandidatoWithMaxVotos();
+        Tblrector rector;
+
+        if (rectorDao.existsTblrectorByFechainicio(LocalDateTime.now())){
+            rector = rectorDao.findTblrectorByFechainicio(LocalDateTime.now());
+        }
+
+        else rector = new Tblrector();
+        rector.setCandidato(winner);
+        rector.setDescripcion(winner.getResumen());
+        rector.setFechainicio(LocalDateTime.now());
+
+        Tblrector newRector = rectorDao.saveOrUpdateRector(rector);
+        List<Object[]> dataRector = rectorDao.findRectorDataByCverector(newRector.getCverector());
+
+        ResponseJsonCandidato response = new ResponseJsonCandidato();
+
+        Object[] row = dataRector.getFirst(); // Obtienes la primera fila (si existe)
+
+        response.setCveuser(((Number) row[0]).longValue());
+        response.setCvecan(((Number) row[1]).longValue());
+        response.setName((String) row[2]);
+        response.setLastName((String) row[3]);
+        response.setEmail((String) row[4]);
+        response.setInstList(Collections.singletonList((String) row[5])); // Asumiendo que hay solo una institución
+        response.setPlantilla((String) row[6]);
+        response.setResumen((String) row[7]);
+
+        return response;
+    }
+
     @Override
     @Transactional
     public ResponseJsonString validateAndSetVoto(ConsumeJsonLongLong consume){
@@ -148,8 +189,14 @@ public class VotacionServiceImp implements VotacionService {
         /*Registra un voto pero no porquien voto*/
         usuario.setVotos(addVotoUsuario());
 
+        var usuinstList = usuario.getInstituciones();
+        long cveentint = 0;
+        for(var usuinst: usuinstList){
+            cveentint = usuinst.getCveinst();
+        }
+
         /*Busca al candidato para añadirle un voto sin relacion directa con el usuario*/
-        findAndsetVoto(cvecandidato);
+        findAndSetVoto(cvecandidato, cveentint);
 
         /*Perisistimos para que el usuario no pueda volver a votar este año*/
         usuarioDao.createOrUpdateUsuario(usuario);
@@ -157,23 +204,46 @@ public class VotacionServiceImp implements VotacionService {
         return  response;
     }
 
-    private void findAndsetVoto(long cvecandidato){
-        if (!candidatoDao.existTblcandidatoByCveCan(cvecandidato)){
-            throw new ResourceNotFoundException("No existe el candidato con clave: "+cvecandidato);
+    private void findAndSetVoto(long cvecandidato, long cveinst) {
+        // Verificar si el candidato existe
+        if (!candidatoDao.existTblcandidatoByCveCan(cvecandidato)) {
+            throw new ResourceNotFoundException("No existe el candidato con clave: " + cvecandidato);
         }
+
+        // Obtener el candidato
         Tblcandidato candidato = candidatoDao.findTblcandidatoByCvecan(cvecandidato);
 
-        if (candidato.getAniocan() != Year.now().getValue()){
-            throw new AccessDeniedException("El candidato "+cvecandidato+" no esta postulado para este año");
+        // Validar el año del candidato
+        if (candidato.getAniocan() != Year.now().getValue()) {
+            throw new AccessDeniedException("El candidato " + cvecandidato + " no está postulado para este año");
         }
 
-        var votos = (candidato.getVotos() != null ? candidato.getVotos() : 0) + 1;
-        log.info("votos {}",votos);
+        // Incrementar votos totales
+        candidato.setVotos((candidato.getVotos() != null ? candidato.getVotos() : 0) + 1);
 
-        log.warn("guardando {}",candidato.getCvecan());
+        // Incrementar votos por institución según cveinst
+        switch ((int) cveinst) {
+            case 1:
+                candidato.setInst1((candidato.getInst1() != null ? candidato.getInst1() : 0) + 1);
+                break;
+            case 2:
+                candidato.setInst2((candidato.getInst2() != null ? candidato.getInst2() : 0) + 1);
+                break;
+            case 3:
+                candidato.setInst3((candidato.getInst3() != null ? candidato.getInst3() : 0) + 1);
+                break;
+            default:
+                throw new ResourceNotFoundException("No existe la institución con clave: " + cveinst);
+        }
+
+        // Log de información
+        log.info("Votos actualizados: {}", candidato.getVotos());
+        log.warn("Guardando candidato con clave: {}", candidato.getCvecan());
+
+        // Persistir cambios
         candidatoDao.createOrUpdateCandidato(candidato);
-
     }
+
 
     private Set<Tblvoto> addVotoUsuario(){
         Tblvoto voto = new Tblvoto();

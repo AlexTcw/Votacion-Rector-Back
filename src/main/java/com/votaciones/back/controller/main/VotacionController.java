@@ -3,6 +3,7 @@ package com.votaciones.back.controller.main;
 import com.votaciones.back.model.exception.ErrorResponse;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongLong;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongString;
+import com.votaciones.back.model.pojos.response.ResponseJsonCandidato;
 import com.votaciones.back.model.pojos.response.ResponseJsonString;
 import com.votaciones.back.service.votacionService.VotacionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,4 +64,13 @@ public class VotacionController {
             @RequestBody ConsumeJsonLongString consume) {
         return ResponseEntity.ok(votacionService.validateAndSetInvalidWithKey(consume));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = {"/setWinner"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Determina al ganador de la votacion")
+    public ResponseEntity<ResponseJsonCandidato> setWinner() {
+        return ResponseEntity.ok(votacionService.setWinner());
+    }
+
+
 }

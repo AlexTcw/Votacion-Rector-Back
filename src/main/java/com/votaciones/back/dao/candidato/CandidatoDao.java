@@ -17,8 +17,6 @@ public interface CandidatoDao {
 
     boolean existTblcandidatoByCveCan(long cveCandidato);
 
-    List<Tblcandidato> findAllByAniocan(int aniocan);
-
     void deleteCandidatoByCvecan(long cvecan);
 
     List<Long>findAllCandidatoesByCvecan();
@@ -28,4 +26,6 @@ public interface CandidatoDao {
     boolean existCandidatoByPlantilla(String plantilla);
 
     Tblcandidato findTblcandidatoByPlantilla(String plantilla);
+
+    Tblcandidato findTblcandidatoWithMaxVotos();
 }

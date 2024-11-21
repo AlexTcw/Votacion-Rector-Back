@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -42,6 +41,15 @@ public class Tblcandidato {
     @Column(name = "ANIOCAN")
     private Integer aniocan;
 
-    @Column(name = "RESUMEN")
+    @Column(name = "RESUMEN", columnDefinition = "LONGTEXT")
     private String resumen;
+
+    @Column(name = "INST1")
+    private Integer inst1;
+
+    @Column(name = "INST2")
+    private Integer inst2;
+
+    @Column(name = "INST3")
+    private Integer inst3;
 }

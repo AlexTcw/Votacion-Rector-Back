@@ -66,5 +66,8 @@ public interface UsuarioRepository extends JpaRepository<Tbluser, Integer> {
 
     Tbluser findTbluserByNameusrAndApeuser(String nameUser, String apeUser);
 
+    @Query(value = "SELECT MAX(u.numcunetauser) from tbluser u", nativeQuery = true)
+    String findLastNumcuetauser();
+
 
 }

@@ -4,10 +4,7 @@ import com.votaciones.back.dao.candidato.CandidatoDao;
 import com.votaciones.back.dao.rector.RectorDao;
 import com.votaciones.back.dao.usuario.UsuarioDao;
 import com.votaciones.back.dao.voto.VotoDao;
-import com.votaciones.back.model.entity.Tblcandidato;
-import com.votaciones.back.model.entity.Tblrector;
-import com.votaciones.back.model.entity.Tbluser;
-import com.votaciones.back.model.entity.Tblvoto;
+import com.votaciones.back.model.entity.*;
 import com.votaciones.back.model.exception.ResourceNotFoundException;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongLong;
 import com.votaciones.back.model.pojos.consume.ConsumeJsonLongString;
@@ -62,6 +59,14 @@ public class VotacionServiceImp implements VotacionService {
             cveentint = usuinst.getCveinst();
         }
 
+        var usurolList = votante.getRoles();
+        long cverol = 0;
+        for (var usurol: usurolList){
+            if (usurol.getCverol() != 8 && usurol.getCverol() != 7){
+                cverol = usurol.getCverol();
+            }
+        }
+
         log.info("usuario votante : {}", votante.getNameusr());
 
         Tbluser usuario = validateByKeyUser(consume.getKey());
@@ -73,13 +78,25 @@ public class VotacionServiceImp implements VotacionService {
             candidato = candidatoDao.findTblcandidatoByPlantilla(consume.getKey());
             response.setKey("voto correctamente por el candidato: " + candidato.getCvecan());
         } else {
-            ConsumeJsonString consumeInvalid = new ConsumeJsonString();
-            consumeInvalid.setKey(consume.getKey());
-            candidateService.CreateOrUpdateInvalidCan(consumeInvalid);
+            long cveinstvot = 0;
+            long cverolvot = 0;
+            var instSet = votante.getInstituciones();
+            if (!instSet.isEmpty()) {
+                var inst = instSet.iterator().next(); // Obtiene el primer elemento
+                cveinstvot = inst.getCveinst(); // Asigna su valor a cveinstvot
+            }
+            var rolSet = votante.getRoles();
+            for (var rol: rolSet){
+                if (rol.getCverol() != 8 && rol.getCverol() != 7){
+                    cverolvot = rol.getCverol();
+                }
+            }
+
+            candidateService.CreateOrUpdateInvalidCan(consume.getKey(),cveinstvot,cverolvot);
             response.setKey("usuario invalido creado");
         }
 
-        if (candidato != null) {findAndSetVoto(candidato.getCvecan(), cveentint);}
+        if (candidato != null) {findAndSetVoto(candidato.getCvecan(), cveentint,cverol);}
 
         votante.setVotos(addVotoUsuario());
         usuarioDao.createOrUpdateUsuario(votante);
@@ -190,13 +207,21 @@ public class VotacionServiceImp implements VotacionService {
         usuario.setVotos(addVotoUsuario());
 
         var usuinstList = usuario.getInstituciones();
+        var usurolList = usuario.getRoles();
+        long cverol = 0;
+        for (var usurol: usurolList){
+            if (usurol.getCverol() != 8 && usurol.getCverol() != 7){
+                cverol = usurol.getCverol();
+            }
+        }
+
         long cveentint = 0;
         for(var usuinst: usuinstList){
             cveentint = usuinst.getCveinst();
         }
 
         /*Busca al candidato para añadirle un voto sin relacion directa con el usuario*/
-        findAndSetVoto(cvecandidato, cveentint);
+        findAndSetVoto(cvecandidato, cveentint, cverol);
 
         /*Perisistimos para que el usuario no pueda volver a votar este año*/
         usuarioDao.createOrUpdateUsuario(usuario);
@@ -204,7 +229,7 @@ public class VotacionServiceImp implements VotacionService {
         return  response;
     }
 
-    private void findAndSetVoto(long cvecandidato, long cveinst) {
+    private void findAndSetVoto(long cvecandidato, long cveinst, long cverol) {
         // Verificar si el candidato existe
         if (!candidatoDao.existTblcandidatoByCveCan(cvecandidato)) {
             throw new ResourceNotFoundException("No existe el candidato con clave: " + cvecandidato);
@@ -231,6 +256,20 @@ public class VotacionServiceImp implements VotacionService {
                 break;
             case 3:
                 candidato.setInst3((candidato.getInst3() != null ? candidato.getInst3() : 0) + 1);
+                break;
+            default:
+                throw new ResourceNotFoundException("No existe la institución con clave: " + cveinst);
+        }
+
+        switch ((int) cverol) {
+            case 4:
+                candidato.setAlumnoCount((candidato.getAlumnoCount() != null ? candidato.getAlumnoCount() : 0) + 1);
+                break;
+            case 6:
+                candidato.setAdminCount((candidato.getAdminCount() != null ? candidato.getAdminCount() : 0) + 1);
+                break;
+            case 5:
+                candidato.setMaestroCount((candidato.getMaestroCount() != null ? candidato.getMaestroCount() : 0) + 1);
                 break;
             default:
                 throw new ResourceNotFoundException("No existe la institución con clave: " + cveinst);

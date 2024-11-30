@@ -52,4 +52,13 @@ public class Tblcandidato {
 
     @Column(name = "INST3")
     private Integer inst3;
+
+    @Column(name = "ALUMNOCOUNT")
+    private Integer alumnoCount;
+
+    @Column(name = "MAESTROCOUNT")
+    private Integer maestroCount;
+
+    @Column(name = "ADMINCOUNT")
+    private Integer adminCount;
 }

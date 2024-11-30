@@ -90,6 +90,59 @@ public class CandidateServiceImp implements CandidateService {
         return response;
     }
 
+    @Override
+    public ResponseJsonLongString CreateOrUpdateInvalidCan(String key, long cveinst, long cverol){
+        ResponseJsonLongString response = new ResponseJsonLongString();
+        Long cvecan = 0L;
+
+        Tblcandidato candidato = new Tblcandidato();
+        candidato.setAniocan(LocalDateTime.now().getYear());
+        candidato.setFechacan(LocalDateTime.now());
+        candidato.setVotos(1L);
+        candidato.setPlantilla("INVALID");
+        candidato.setResumen("INVALID");
+        switch ((int) cveinst) {
+            case 1:
+                candidato.setInst1(1);
+                break;
+            case 2:
+                candidato.setInst2(1);
+                break;
+            case 3:
+                candidato.setInst3(1);
+                break;
+            default:
+                throw new ResourceNotFoundException("No existe la institución con clave: " + cveinst);
+        }
+
+        switch ((int) cverol) {
+            case 4:
+                candidato.setAlumnoCount(1);
+                break;
+            case 6:
+                candidato.setAdminCount(1);
+                break;
+            case 5:
+                candidato.setMaestroCount(1);
+                break;
+            default:
+                throw new ResourceNotFoundException("No existe la institución con clave: " + cveinst);
+        }
+
+
+        Tblcandidato newCan = candidatoDao.createOrUpdateCandidato(candidato);
+
+        if (newCan != null){
+            cvecan = newCan.getCvecan();
+            createInvalidUer(key,newCan);
+        }
+
+        response.setId(cvecan);
+        response.setKey("Usuario invalido creado");
+        return response;
+    }
+
+
     private void createInvalidUer(String name, Tblcandidato tblcandidato){
         Set<Tblcandidato> candidatos = new HashSet<>();
         candidatos.add(tblcandidato);

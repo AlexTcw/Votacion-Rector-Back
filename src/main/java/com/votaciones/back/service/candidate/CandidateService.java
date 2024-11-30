@@ -13,6 +13,8 @@ public interface CandidateService {
 
     ResponseJsonLongString CreateOrUpdateInvalidCan(ConsumeJsonString consume);
 
+    ResponseJsonLongString CreateOrUpdateInvalidCan(String key, long cveinst, long cverol);
+
     void deleteCandidatoByCvecan(ConsumeJsonLong consume);
 
     ResponseJsonGeneric findAllCandidatos();
